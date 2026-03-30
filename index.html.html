@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Md Reyad Hossain | Futuristic Portfolio</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- GSAP for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #05070a;
+            color: #eef5ff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            cursor: default;
+        }
+
+        /* custom cursor */
+        .custom-cursor {
+            width: 12px;
+            height: 12px;
+            background: #00a6ff;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+            box-shadow: 0 0 8px #00aaff;
+        }
+        .cursor-follower {
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid #3b82f6;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: 0.15s ease-out;
+        }
+
+        /* preloader */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #010101;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 1s ease, visibility 0.5s;
+        }
+        .loader-text {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; letter-spacing: 4px; }
+            100% { opacity: 1; letter-spacing: 10px; }
+        }
+
+        /* scroll progress */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #a855f7);
+            z-index: 1000;
+            transition: width 0.1s;
+        }
+
+        /* back to top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(15, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            border: 1px solid rgba(59,130,246,0.5);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 99;
+        }
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .back-to-top:hover {
+            background: #3b82f6;
+            transform: translateY(-5px);
+        }
+
+        /* container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        section {
+            padding: 100px 0;
+        }
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+        }
+        h2 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #ffffff, #94a3f8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 2.5rem;
+            display: inline-block;
+        }
+
+        /* glass cards */
+        .glass-card {
+            background: rgba(15, 25, 45, 0.45);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 28px;
+            padding: 1.8rem;
+            transition: all 0.4s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .glass-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(59,130,246,0.2);
+        }
+
+        /* skill bar */
+        .skill-item {
+            margin-bottom: 1.5rem;
+        }
+        .skill-name {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .skill-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .skill-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #c084fc);
+            border-radius: 20px;
+            transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* animated counters */
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: 'Space Grotesk';
+            background: linear-gradient(135deg, #f0f9ff, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* contact form */
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(10, 20, 35, 0.7);
+            border: 1px solid #2d3a5e;
+            border-radius: 40px;
+            color: white;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 8px rgba(59,130,246,0.5);
+        }
+        .btn-primary {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(37,99,235,0.4);
+        }
+        .social-icons a {
+            color: #e2e8f0;
+            font-size: 1.8rem;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .social-icons a:hover {
+            color: #3b82f6;
+            transform: translateY(-5px);
+        }
+
+        /* particle canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .relative-layer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* typing animation */
+        .typing {
+            font-size: 1.8rem;
+            font-weight: 500;
+            border-right: 3px solid #3b82f6;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 2s steps(30, end) forwards, blink 0.75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink {
+            0%,100% { border-color: transparent; }
+            50% { border-color: #3b82f6; }
+        }
+
+        /* responsive */
+        @media (max-width: 768px) {
+            .container { padding: 0 1.5rem; }
+            h2 { font-size: 2rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .typing { font-size: 1.2rem; white-space: normal; border-right: none; animation: none; width: auto; }
+            .custom-cursor, .cursor-follower { display: none; }
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .btn-outline {
+            border: 1px solid #3b82f6;
+            background: transparent;
+            padding: 12px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover {
+            background: #3b82f6;
+            box-shadow: 0 0 12px #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="preloader" id="preloader">
+    <div class="loader-text">REYAD</div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+<div class="custom-cursor" id="customCursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+<button class="back-to-top" id="backToTop"><i class="fas fa-chevron-up"></i></button>
+<canvas id="particle-canvas"></canvas>
+
+<div class="relative-layer">
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="glass-card" style="background: rgba(5,10,20,0.5); backdrop-filter: blur(16px);">
+                <span class="badge" style="color:#60a5fa;">✦ WELCOME TO MY DIGITAL SPACE</span>
+                <h1 style="font-size: 4rem; margin: 0.5rem 0;">Md Reyad Hossain</h1>
+                <div class="typing" id="typingText"></div>
+                <p style="margin: 1.5rem 0; font-size: 1.2rem; opacity:0.9;">Student | Nursing Professional | Digital Enthusiast</p>
+                <div class="flex-between" style="gap: 1rem; margin-top: 2rem;">
+                    <a href="#portfolio" class="btn-primary" id="viewPortfolioBtn">View Portfolio <i class="fas fa-arrow-right"></i></a>
+                    <a href="#contact" class="btn-outline">Contact Me <i class="fas fa-paper-plane"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <h2>About Me</h2>
+            <div class="glass-card">
+                <p style="font-size: 1.2rem; line-height: 1.6;">My name is <strong>Md Reyad Hossain</strong>, and I am from Pabna, an old, beautiful and culturally rich city in Bangladesh.</p>
+                <p style="margin-top: 1rem;">Currently I'm studying <strong>Bachelor of Science In Nursing</strong> under Rajshahi Medical University.</p>
+                <p style="margin-top: 1rem;">Hard-working, self-motivated, strong communication skills, always eager to learn. Passionate about merging healthcare with digital innovation.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <div class="container">
+            <h2>Professional Skills</h2>
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3><i class="fas fa-laptop-code"></i> Digital Toolkit</h3>
+                    <div class="skill-item"><div class="skill-name"><span>Microsoft Office Pro</span><span>90%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="90"></div></div></div>
+                    <div class="skill-item"><div class="skill-name"><span>Digital Marketing</span><span>85%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="85"></div></div></div>
+                    <div class="skill-item"><div class="skill-name"><span>Basic Graphics Design</span><span>78%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="78"></div></div></div>
+                    <div class="skill-item"><div class="skill-name"><span>Social Media Management</span><span>88%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="88"></div></div></div>
+                </div>
+                <div class="glass-card">
+                    <h3><i class="fas fa-heartbeat"></i> Clinical Expertise</h3>
+                    <div class="skill-item"><div class="skill-name"><span>Nursing Management</span><span>75%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="75"></div></div></div>
+                    <div class="skill-item"><div class="skill-name"><span>Nursing Care Knowledge</span><span>82%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="82"></div></div></div>
+                    <div class="skill-item"><div class="skill-name"><span>Patient Communication</span><span>89%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="89"></div></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Highlights with Counters -->
+    <section id="experience">
+        <div class="container">
+            <h2>Experience & Highlights</h2>
+            <div class="grid-2">
+                <div class="glass-card">
+                    <i class="fas fa-chart-line" style="font-size: 2.5rem; color: #3b82f6;"></i>
+                    <h3>Social Media Manager</h3>
+                    <p>Managed content strategy, analytics, and engagement for a reputed online shop. Boosted reach by 120% in 6 months.</p>
+                    <div class="stat-number" id="expCounter">0+</div>
+                    <p>Months of strategic experience</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-calendar-alt" style="font-size: 2.5rem; color: #a855f7;"></i>
+                    <h3>Projects Completed</h3>
+                    <div class="stat-number" id="projectCounter">0+</div>
+                    <p>Digital campaigns & creative designs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2>Let's Connect</h2>
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3><i class="fas fa-address-card"></i> Contact Info</h3>
+                    <p><i class="fas fa-envelope"></i> reyadhasan632@gmail.com</p>
+                    <p><i class="fas fa-phone-alt"></i> +8801641634697</p>
+                    <div class="social-icons" style="margin-top: 2rem; display: flex; gap: 1.5rem;">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="glass-card">
+                    <form id="contactForm">
+                        <div class="form-group"><input type="text" id="name" placeholder="Your Name" required></div>
+                        <div class="form-group"><input type="email" id="email" placeholder="Email Address" required></div>
+                        <div class="form-group"><textarea rows="3" id="message" placeholder="Your Message"></textarea></div>
+                        <button type="submit" class="btn-primary">Send Message <i class="fas fa-paper-plane"></i></button>
+                        <div id="formFeedback" style="margin-top: 1rem; font-size: 0.85rem;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; border-top: 1px solid rgba(59,130,246,0.2);">
+        <p>© 2025 Md Reyad Hossain. Futuristic Portfolio — All rights reserved.</p>
+    </footer>
+</div>
+
+<script>
+    // preloader
+    window.addEventListener('load', () => {
+        const preloader = document.getElementById('preloader');
+        setTimeout(() => {
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        }, 800);
+        initScrollAnimations();
+        initSkillBars();
+        startTypingEffect();
+        initCounters();
+    });
+
+    // GSAP + ScrollTrigger
+    function initScrollAnimations() {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('section').forEach((section, i) => {
+            gsap.from(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse',
+                },
+                opacity: 0,
+                y: 40,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+        });
+        // glass cards staggered
+        gsap.utils.toArray('.glass-card').forEach(card => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%',
+                },
+                scale: 0.96,
+                opacity: 0,
+                duration: 0.6
+            });
+        });
+    }
+
+    function initSkillBars() {
+        const fills = document.querySelectorAll('.skill-bar-fill');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const fill = entry.target;
+                    const width = fill.getAttribute('data-width');
+                    fill.style.width = width + '%';
+                    observer.unobserve(fill);
+                }
+            });
+        }, { threshold: 0.5 });
+        fills.forEach(fill => observer.observe(fill));
+    }
+
+    // typing effect
+    function startTypingEffect() {
+        const element = document.getElementById('typingText');
+        const texts = ["Student | Nursing Professional | Digital Enthusiast", "Healthcare meets Innovation", "Future Nurse & Creator"];
+        let index = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        function typeEffect() {
+            const current = texts[index];
+            if (isDeleting) {
+                element.textContent = current.substring(0, charIndex--);
+                if (charIndex < 0) {
+                    isDeleting = false;
+                    index = (index + 1) % texts.length;
+                    setTimeout(typeEffect, 500);
+                    return;
+                }
+            } else {
+                element.textContent = current.substring(0, charIndex++);
+                if (charIndex === current.length + 1) {
+                    isDeleting = true;
+                    setTimeout(typeEffect, 1800);
+                    return;
+                }
+            }
+            setTimeout(typeEffect, isDeleting ? 50 : 100);
+        }
+        typeEffect();
+    }
+
+    // animated counters
+    function initCounters() {
+        const expSpan = document.getElementById('expCounter');
+        const projSpan = document.getElementById('projectCounter');
+        let expVal = 0, projVal = 0;
+        const targetExp = 24;
+        const targetProj = 18;
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const interval = setInterval(() => {
+                        if (expVal < targetExp) expVal++;
+                        if (projVal < targetProj) projVal++;
+                        expSpan.innerText = expVal + '+';
+                        projSpan.innerText = projVal + '+';
+                        if (expVal >= targetExp && projVal >= targetProj) clearInterval(interval);
+                    }, 40);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.7 });
+        const parent = document.getElementById('experience');
+        if(parent) counterObserver.observe(parent);
+    }
+
+    // contact form validation & interactive feedback + sound optional
+    const contactForm = document.getElementById('contactForm');
+    const feedbackDiv = document.getElementById('formFeedback');
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const message = document.getElementById('message').value.trim();
+        if(!name || !email || !message) {
+            feedbackDiv.innerHTML = '<span style="color:#f87171;">❌ All fields required.</span>';
+            return;
+        }
+        if(!email.includes('@') || !email.includes('.')) {
+            feedbackDiv.innerHTML = '<span style="color:#f87171;">⚠️ Valid email required.</span>';
+            return;
+        }
+        feedbackDiv.innerHTML = '<span style="color:#4ade80;">✨ Message sent! (Demo) I’ll reach you soon.</span>';
+        contactForm.reset();
+        setTimeout(() => feedbackDiv.innerHTML = '', 3000);
+        // optional subtle beep? but not intrusive - skip
+    });
+
+    // scroll progress
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('progressBar').style.width = scrolled + '%';
+        const backBtn = document.getElementById('backToTop');
+        if (winScroll > 400) backBtn.classList.add('show');
+        else backBtn.classList.remove('show');
+    });
+    document.getElementById('backToTop').addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // custom cursor
+    const cursor = document.getElementById('customCursor');
+    const follower = document.getElementById('cursorFollower');
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.transform = `translate(${e.clientX - 6}px, ${e.clientY - 6}px)`;
+        follower.style.transform = `translate(${e.clientX - 16}px, ${e.clientY - 16}px)`;
+    });
+    document.querySelectorAll('a, button, .btn-primary, .btn-outline').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            cursor.style.transform = `scale(1.8)`;
+            follower.style.transform = `scale(1.4)`;
+            follower.style.borderColor = '#a855f7';
+        });
+        el.addEventListener('mouseleave', () => {
+            cursor.style.transform = `scale(1)`;
+            follower.style.transform = `scale(1)`;
+            follower.style.borderColor = '#3b82f6';
+        });
+    });
+
+    // particle canvas background (floating futuristic)
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let particleCount = 80;
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2.5 + 1;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+            this.color = `rgba(59,130,246,${Math.random() * 0.3 + 0.1})`;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0) this.x = canvas.width;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.y < 0) this.y = canvas.height;
+            if (this.y > canvas.height) this.y = 0;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+    }
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    }
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animateParticles);
+    }
+    initParticles();
+    animateParticles();
+
+    // smooth scrolling for anchor links + View Portfolio button
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            if(targetId === "#" || targetId === "") return;
+            const targetEl = document.querySelector(targetId);
+            if(targetEl) {
+                e.preventDefault();
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+    document.getElementById('viewPortfolioBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('skills').scrollIntoView({ behavior: 'smooth' });
+    });
+    // additional micro sound: optional but not intrusive - skip for clean
+</script>
+</body>
+</html>
